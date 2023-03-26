@@ -1,0 +1,16 @@
+package routers
+
+import (
+	"golang_microservices/controllers"
+
+	"github.com/gin-gonic/gin"
+)
+
+func StartServer() *gin.Engine {
+	router := gin.Default()
+
+	router.GET("/books", controllers.GetBooks)
+	router.POST("/books", controllers.CreateBook)
+
+	return router
+}

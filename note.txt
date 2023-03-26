@@ -1,0 +1,42 @@
+Book Attribute
+{
+  Id int unique
+  Title string
+  Author string 
+  Desc string 
+}
+
+Root URL : http://localhost:4000
+
+Endpoint-Endpoint REST API
+1. Get All Book : 
+    url : GET /books
+    return data : [
+      {
+        "id": int,
+        "title": string, 
+        "author": string,
+        "desc": string
+      }
+    ]
+
+2. Get Book By Id : 
+    url : GET /books/:id
+    return data : {
+      "id": int,
+      "title": string, 
+      "author": string,
+      "desc": string
+    }
+
+3. Add Book : 
+    url : POST /books
+    return data : {message: "Created"} 
+
+4. Update Book : 
+    url : PUT /books/:id
+    return data : {message: "Updated"} 
+
+5. Delete Book : 
+    url : DELETE /books/:id
+    return data : {message: "Deleted"}
