@@ -56,7 +56,6 @@ func GetBookById(ctx *gin.Context) {
 
 func UpdateBook(ctx *gin.Context) {
 	bookId := ctx.Param("id")
-	bookExist := false
 	var updatedBook models.Book
 
 	if err := ctx.ShouldBindJSON(&updatedBook); err != nil {
@@ -64,33 +63,18 @@ func UpdateBook(ctx *gin.Context) {
 		return
 	}
 
-	for i, book := range bookDatas {
-		if bookId == strconv.Itoa(book.Id) {
+	rowUpdated := models.UpdateBook(bookId, updatedBook)
 
-			bookDatas[i] = updatedBook
-			strBookId, err := strconv.Atoi(bookId)
-			if err == nil {
-				bookDatas[i].Id = strBookId
-			} else {
-				break
-			}
-			bookExist = true
-			break
-		}
-	}
-
-	if !bookExist {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error_status":  "Data Not Found",
-			"error_message": fmt.Sprintf("Book with id %v not found", bookId),
+	if rowUpdated == 1 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Updated",
 		})
-
-		return
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed Updated",
+		})
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Updated",
-	})
 }
 
 func DeleteBook(ctx *gin.Context) {

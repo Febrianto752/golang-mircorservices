@@ -132,6 +132,11 @@ func GetBook(id string) Book {
 	fmt.Println("Successfully connected to database")
 
 	bookId, err := strconv.Atoi(id)
+
+	if err != nil {
+		panic(err)
+	}
+
 	var book Book
 
 	sqlStatement := `SELECT * FROM books WHERE id = $1`
@@ -153,5 +158,50 @@ func GetBook(id string) Book {
 	}
 
 	return book
+
+}
+
+func UpdateBook(id string, book Book) int64 {
+	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Successfully connected to database")
+
+	bookId, err := strconv.Atoi(id)
+
+	if err != nil {
+		panic(err)
+	}
+
+	sqlStatement := `
+			UPDATE books 
+			SET title = $2, author = $3, description = $4
+			WHERE id = $1;
+		`
+
+	res, err := db.Exec(sqlStatement, bookId, book.Title, book.Author, book.Description)
+
+	if err != nil {
+		panic(err)
+	}
+
+	count, err := res.RowsAffected()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return count
 
 }
