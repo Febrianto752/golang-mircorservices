@@ -4,9 +4,7 @@ import (
 	"golang_microservices/routers"
 )
 
-
 func main() {
-	
 
 	var PORT = ":8080"
 

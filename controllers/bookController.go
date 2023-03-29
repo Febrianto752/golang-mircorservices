@@ -8,13 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// type Book struct {
-// 	Id     int    `json:"book_id"`
-// 	Title  string `json:"title"`
-// 	Author string `json:"author"`
-// 	Desc   string `json:"desc"`
-// }
-
 var bookDatas = []models.Book{}
 
 func GetBooks(ctx *gin.Context) {
@@ -31,8 +24,6 @@ func CreateBook(ctx *gin.Context) {
 		return
 	}
 
-	// newBook.Id = len(bookDatas) + 1
-	// bookDatas = append(bookDatas, newBook)
 	models.CreateBook(newBook)
 
 	ctx.JSON(http.StatusCreated, gin.H{
@@ -42,7 +33,7 @@ func CreateBook(ctx *gin.Context) {
 
 func GetBookById(ctx *gin.Context) {
 	bookId := ctx.Param("id")
-	// bookExist := false
+
 	var bookData models.Book
 
 	bookData = models.GetBook(bookId)

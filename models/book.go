@@ -31,8 +31,6 @@ var (
 func CreateBook(book Book) {
 	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	// memeriksa/verifikasi info psqlInfo benar
-
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
@@ -40,15 +38,12 @@ func CreateBook(book Book) {
 
 	defer db.Close()
 
-	// connecting to database
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Successfully connected to database")
-
-	// var book = Book{}
 
 	sqlStatement := `
     INSERT INTO books (title, author, description) VALUES ($1, $2, $3)
@@ -67,8 +62,6 @@ func CreateBook(book Book) {
 func GetBooks() []Book {
 	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	// memeriksa/verifikasi info psqlInfo benar
-
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
@@ -76,7 +69,6 @@ func GetBooks() []Book {
 
 	defer db.Close()
 
-	// connecting to database
 	err = db.Ping()
 	if err != nil {
 		panic(err)
@@ -111,7 +103,6 @@ func GetBooks() []Book {
 	}
 
 	return results
-	// contoh output : [{1 febrianto febri@gmail.com 23 Developer} {2 febrianto febri2@gmail.com 23 Developer} ]
 }
 
 func GetBook(id string) Book {
@@ -233,7 +224,7 @@ func DeleteBook(id string) int64 {
 			DELETE FROM books
 			WHERE id = $1;
 		`
-	// jika id tidak ada , maka tidak akan trigger error, knp ya?
+
 	res, err := db.Exec(sqlStatement, bookId)
 
 	if err != nil {
