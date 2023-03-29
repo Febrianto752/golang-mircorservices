@@ -1,0 +1,50 @@
+Query Create table : 
+CREATE TABLE books (
+  id SERIAL PRIMARY KEY
+  title VARCHAR(50) NOT NULL
+  author VARCHAR(50) NOT NULL 
+  description TEXT NOT NULL
+);
+
+Book Attribute :
+{
+  Id int unique
+  Title string
+  Author string 
+  Desc string 
+}
+
+Root URL : http://localhost:8080
+
+Endpoint-Endpoint REST API :
+1. Get All Book : 
+    url : GET /books
+    return data : [
+      {
+        "id": int,
+        "title": string, 
+        "author": string,
+        "desc": string
+      }
+    ]
+
+2. Get Book By Id : 
+    url : GET /books/:id
+    return data : {
+      "id": int,
+      "title": string, 
+      "author": string,
+      "desc": string
+    }
+
+3. Add Book : 
+    url : POST /books
+    return data : {message: "Created"} 
+
+4. Update Book : 
+    url : PUT /books/:id
+    return data : {message: "Updated"} 
+
+5. Delete Book : 
+    url : DELETE /books/:id
+    return data : {message: "Deleted"}
