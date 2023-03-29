@@ -205,3 +205,47 @@ func UpdateBook(id string, book Book) int64 {
 	return count
 
 }
+
+func DeleteBook(id string) int64 {
+	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Successfully connected to database")
+
+	bookId, err := strconv.Atoi(id)
+
+	if err != nil {
+		panic(err)
+	}
+
+	sqlStatement := `
+			DELETE FROM books
+			WHERE id = $1;
+		`
+	// jika id tidak ada , maka tidak akan trigger error, knp ya?
+	res, err := db.Exec(sqlStatement, bookId)
+
+	if err != nil {
+		panic(err)
+	}
+
+	count, err := res.RowsAffected()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return count
+
+}

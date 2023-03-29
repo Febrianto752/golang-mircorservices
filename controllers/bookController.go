@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"golang_microservices/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -79,32 +78,18 @@ func UpdateBook(ctx *gin.Context) {
 
 func DeleteBook(ctx *gin.Context) {
 	bookId := ctx.Param("id")
-	bookExist := false
-	var bookIndex int
 
-	for i, book := range bookDatas {
-		if bookId == strconv.Itoa(book.Id) {
-			bookExist = true
-			bookIndex = i
-			break
-		}
-	}
+	count := models.DeleteBook(bookId)
 
-	if !bookExist {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{
-			"error_status":  "Data Not Found",
-			"error_message": fmt.Sprintf("Book with id %v not found", bookId),
+	if count == 1 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf("book with id %v has been successfully deleted", bookId),
 		})
 
-		return
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed Deleted",
+		})
 	}
-
-	copy(bookDatas[bookIndex:], bookDatas[bookIndex+1:])
-	bookDatas[len(bookDatas)-1] = models.Book{}
-	bookDatas = bookDatas[:len(bookDatas)-1]
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("book with id %v has been successfully deleted", bookId),
-	})
 
 }
