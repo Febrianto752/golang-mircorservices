@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"golang_microservices/database"
+
 	_ "github.com/lib/pq"
 )
 
@@ -29,21 +31,9 @@ var (
 )
 
 func CreateBook(book Book) {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
+	db := database.GetDB()
+	fmt.Println("db :", db)
 	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected to database")
 
 	sqlStatement := `
     INSERT INTO books (title, author, description) VALUES ($1, $2, $3)
@@ -60,21 +50,7 @@ func CreateBook(book Book) {
 }
 
 func GetBooks() []Book {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected to database")
+	db := database.GetDB()
 
 	var results = []Book{}
 
@@ -106,21 +82,7 @@ func GetBooks() []Book {
 }
 
 func GetBook(id string) Book {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected to database")
+	db := database.GetDB()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -153,21 +115,7 @@ func GetBook(id string) Book {
 }
 
 func UpdateBook(id string, book Book) int64 {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected to database")
+	db := database.GetDB()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -198,21 +146,7 @@ func UpdateBook(id string, book Book) int64 {
 }
 
 func DeleteBook(id string) int64 {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-
-	defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Successfully connected to database")
+	db := database.GetDB()
 
 	bookId, err := strconv.Atoi(id)
 
