@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 
@@ -17,22 +16,8 @@ type Book struct {
 	Description string `json:"description"`
 }
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "admin123"
-	dbname   = "golang-dasar"
-)
-
-var (
-	db  *sql.DB
-	err error
-)
-
 func CreateBook(book Book) {
 	db := database.GetDB()
-	fmt.Println("db :", db)
 	defer db.Close()
 
 	sqlStatement := `
@@ -40,7 +25,7 @@ func CreateBook(book Book) {
     returning *
   `
 
-	err = db.QueryRow(sqlStatement, book.Title, book.Author, book.Description).Scan(&book.Id, &book.Title, &book.Author, &book.Description)
+	err := db.QueryRow(sqlStatement, book.Title, book.Author, book.Description).Scan(&book.Id, &book.Title, &book.Author, &book.Description)
 
 	if err != nil {
 		panic(err)
@@ -51,6 +36,7 @@ func CreateBook(book Book) {
 
 func GetBooks() []Book {
 	db := database.GetDB()
+	defer db.Close()
 
 	var results = []Book{}
 
@@ -83,6 +69,7 @@ func GetBooks() []Book {
 
 func GetBook(id string) Book {
 	db := database.GetDB()
+	defer db.Close()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -116,6 +103,7 @@ func GetBook(id string) Book {
 
 func UpdateBook(id string, book Book) int64 {
 	db := database.GetDB()
+	defer db.Close()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -147,6 +135,7 @@ func UpdateBook(id string, book Book) int64 {
 
 func DeleteBook(id string) int64 {
 	db := database.GetDB()
+	defer db.Close()
 
 	bookId, err := strconv.Atoi(id)
 
