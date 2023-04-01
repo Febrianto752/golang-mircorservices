@@ -98,33 +98,23 @@ func UpdateBook(id string, book Book) (Book, error) {
 
 }
 
-// func DeleteBook(id string) int64 {
-// 	db := database.GetDB()
-// 	defer db.Close()
+func DeleteBook(id string) (int64, error) {
+	db := database.GetDB()
 
-// 	bookId, err := strconv.Atoi(id)
+	bookId, err := strconv.Atoi(id)
 
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	if err != nil {
+		panic(err)
+	}
 
-// 	sqlStatement := `
-// 			DELETE FROM books
-// 			WHERE id = $1;
-// 		`
+	book := Book{}
 
-// 	res, err := db.Exec(sqlStatement, bookId)
+	affectedRows := db.Where("id = ?", bookId).Delete(&book).RowsAffected
+	if affectedRows == 0 {
+		fmt.Println("Error deleting product")
+		return affectedRows, errors.New("Error deleting product")
+	} else {
+		return affectedRows, nil
+	}
 
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	count, err := res.RowsAffected()
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	return count
-
-// }
+}

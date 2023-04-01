@@ -69,20 +69,19 @@ func UpdateBook(ctx *gin.Context) {
 	}
 }
 
-// func DeleteBook(ctx *gin.Context) {
-// 	bookId := ctx.Param("id")
+func DeleteBook(ctx *gin.Context) {
+	bookId := ctx.Param("id")
 
-// 	count := models.DeleteBook(bookId)
+	count, _ := models.DeleteBook(bookId)
 
-// 	if count == 1 {
-// 		ctx.JSON(http.StatusOK, gin.H{
-// 			"message": fmt.Sprintf("book with id %v has been successfully deleted", bookId),
-// 		})
+	if count == 1 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "Book deleted successfully",
+		})
 
-// 	} else {
-// 		ctx.JSON(http.StatusBadRequest, gin.H{
-// 			"message": "Failed Deleted",
-// 		})
-// 	}
-
-// }
+	} else {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "Failed Deleted",
+		})
+	}
+}
