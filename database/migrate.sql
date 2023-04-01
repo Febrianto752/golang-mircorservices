@@ -1,5 +1,5 @@
 -- DDL
-CREATE DATABASE golang_dasar;
+CREATE DATABASE ch2_session4;
 
 CREATE TABLE books (
   id SERIAL PRIMARY KEY,

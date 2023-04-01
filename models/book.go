@@ -1,75 +1,59 @@
 package models
 
 import (
+	"errors"
 	"fmt"
-	"strconv"
-
 	"golang_microservices/database"
+	"strconv"
+	"time"
 
 	_ "github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 type Book struct {
-	Id          int    `json:"book_id"`
-	Title       string `json:"title"`
-	Author      string `json:"author"`
-	Description string `json:"description"`
+	Id        int       `gorm:"primaryKey" json:"id"`
+	BookName  string    `gorm:"not null;unique;type:varchar(100)" json:"book_name"`
+	Author    string    `gorm:"not null;type:varchar(100)" json:"author"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func CreateBook(book Book) {
+func CreateBook(newBook Book) Book {
 	db := database.GetDB()
-	defer db.Close()
 
-	sqlStatement := `
-    INSERT INTO books (title, author, description) VALUES ($1, $2, $3)
-    returning *
-  `
+	book := Book{
+		BookName: newBook.BookName,
+		Author:   newBook.Author,
+	}
 
-	err := db.QueryRow(sqlStatement, book.Title, book.Author, book.Description).Scan(&book.Id, &book.Title, &book.Author, &book.Description)
+	err := db.Create(&book).Error
 
 	if err != nil {
+		fmt.Println("Error creating user data :", err)
 		panic(err)
 	}
 
-	fmt.Printf("New Book Data : %+v \n", book)
+	fmt.Println("New Book Data :", book)
+	return book
 }
 
 func GetBooks() []Book {
 	db := database.GetDB()
-	defer db.Close()
 
-	var results = []Book{}
+	var books = []Book{}
 
-	sqlStatement := `SELECT * FROM books`
-
-	rows, err := db.Query(sqlStatement)
+	err := db.Find(&books).Error
 
 	if err != nil {
-		fmt.Println("panic 1")
 		panic(err)
 	}
 
-	defer rows.Close()
-
-	for rows.Next() {
-		var book = Book{}
-
-		err = rows.Scan(&book.Id, &book.Title, &book.Author, &book.Description)
-
-		if err != nil {
-			fmt.Println("Panic 2")
-			panic(err)
-		}
-
-		results = append(results, book)
-	}
-
-	return results
+	return books
 }
 
-func GetBook(id string) Book {
+func GetBook(id string) (Book, error) {
 	db := database.GetDB()
-	defer db.Close()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -79,31 +63,21 @@ func GetBook(id string) Book {
 
 	var book Book
 
-	sqlStatement := `SELECT * FROM books WHERE id = $1`
-
-	rows, err := db.Query(sqlStatement, bookId)
-
+	err = db.First(&book, "id = ?", bookId).Error
 	if err != nil {
-		panic(err)
-	}
-
-	defer rows.Close()
-
-	for rows.Next() {
-		err = rows.Scan(&book.Id, &book.Title, &book.Author, &book.Description)
-		if err != nil {
-			panic(err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			fmt.Println("User data not found")
+			return book, err
 		}
-
+		print("Error finding user", err)
 	}
 
-	return book
+	return book, nil
 
 }
 
-func UpdateBook(id string, book Book) int64 {
+func UpdateBook(id string, book Book) (Book, error) {
 	db := database.GetDB()
-	defer db.Close()
 
 	bookId, err := strconv.Atoi(id)
 
@@ -111,55 +85,46 @@ func UpdateBook(id string, book Book) int64 {
 		panic(err)
 	}
 
-	sqlStatement := `
-			UPDATE books 
-			SET title = $2, author = $3, description = $4
-			WHERE id = $1;
-		`
+	bookUpdated := Book{Id: bookId}
 
-	res, err := db.Exec(sqlStatement, bookId, book.Title, book.Author, book.Description)
+	err = db.Model(&bookUpdated).Where("id = ?", bookId).Updates(Book{BookName: book.BookName, Author: book.Author}).Error
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error updateing book data :", err)
+		return bookUpdated, err
 	}
 
-	count, err := res.RowsAffected()
-
-	if err != nil {
-		panic(err)
-	}
-
-	return count
+	return bookUpdated, nil
 
 }
 
-func DeleteBook(id string) int64 {
-	db := database.GetDB()
-	defer db.Close()
+// func DeleteBook(id string) int64 {
+// 	db := database.GetDB()
+// 	defer db.Close()
 
-	bookId, err := strconv.Atoi(id)
+// 	bookId, err := strconv.Atoi(id)
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	sqlStatement := `
-			DELETE FROM books
-			WHERE id = $1;
-		`
+// 	sqlStatement := `
+// 			DELETE FROM books
+// 			WHERE id = $1;
+// 		`
 
-	res, err := db.Exec(sqlStatement, bookId)
+// 	res, err := db.Exec(sqlStatement, bookId)
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	count, err := res.RowsAffected()
+// 	count, err := res.RowsAffected()
 
-	if err != nil {
-		panic(err)
-	}
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	return count
+// 	return count
 
-}
+// }

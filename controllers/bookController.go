@@ -1,14 +1,13 @@
 package controllers
 
 import (
-	"fmt"
 	"golang_microservices/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var bookDatas = []models.Book{}
+// var bookDatas = []models.Book{}
 
 func GetBooks(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
@@ -24,23 +23,27 @@ func CreateBook(ctx *gin.Context) {
 		return
 	}
 
-	models.CreateBook(newBook)
+	book := models.CreateBook(newBook)
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"message": "Created",
+		"book": book,
 	})
 }
 
 func GetBookById(ctx *gin.Context) {
 	bookId := ctx.Param("id")
 
-	var bookData models.Book
+	book, err := models.GetBook(bookId)
 
-	bookData = models.GetBook(bookId)
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"book": bookData,
-	})
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "Book Not Found",
+		})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{
+			"book": book,
+		})
+	}
 
 }
 
@@ -53,34 +56,33 @@ func UpdateBook(ctx *gin.Context) {
 		return
 	}
 
-	rowUpdated := models.UpdateBook(bookId, updatedBook)
+	bookUpdated, err := models.UpdateBook(bookId, updatedBook)
 
-	if rowUpdated == 1 {
+	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Updated",
+			"book": bookUpdated,
 		})
 	} else {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed Updated",
+			"message": "bad request",
 		})
 	}
-
 }
 
-func DeleteBook(ctx *gin.Context) {
-	bookId := ctx.Param("id")
+// func DeleteBook(ctx *gin.Context) {
+// 	bookId := ctx.Param("id")
 
-	count := models.DeleteBook(bookId)
+// 	count := models.DeleteBook(bookId)
 
-	if count == 1 {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("book with id %v has been successfully deleted", bookId),
-		})
+// 	if count == 1 {
+// 		ctx.JSON(http.StatusOK, gin.H{
+// 			"message": fmt.Sprintf("book with id %v has been successfully deleted", bookId),
+// 		})
 
-	} else {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Failed Deleted",
-		})
-	}
+// 	} else {
+// 		ctx.JSON(http.StatusBadRequest, gin.H{
+// 			"message": "Failed Deleted",
+// 		})
+// 	}
 
-}
+// }

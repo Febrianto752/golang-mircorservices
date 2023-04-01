@@ -1,39 +1,30 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
+	"log"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-const (
+var (
 	host     = "localhost"
-	port     = 5432
+	port     = "5432"
 	user     = "postgres"
 	password = "admin123"
-	dbname   = "golang-dasar"
+	dbname   = "ch2_session4"
+	DB       *gorm.DB
+	err      error
 )
 
-// var (
-// 	db  *sql.DB
-// 	err error
-// )
+func GetDB() (db *gorm.DB) {
+	config := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbname, port)
 
-func GetDB() *sql.DB {
-	var psqlInfo = fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err := gorm.Open(postgres.Open(config), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		log.Fatal("error connecting to database :", err)
 	}
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("db :", db)
-
-	fmt.Println("Successfully connected to database")
-
-	return db
+	return
 }
